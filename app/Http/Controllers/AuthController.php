@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -37,33 +38,55 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (!Auth::guard('sanctum')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = Auth::guard('sanctum')->user();
+
+        $user->tokens()->delete();
+
+        $newToken = $user->createToken('auth_token');
 
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $newToken->plainTextToken,
             'token_type' => 'Bearer',
         ]);
     }
-	
+
 	public function logout(Request $request)
 	{
     // Удаляем все токены пользователя
-		// $request->user()->tokens()->delete();
-
-		// Или удалить только текущий токен:
-		$request->user()->currentAccessToken()->delete();
+		$request->user()->tokens()->delete();
 
 		return response()->json(['message' => 'Successfully logged out']);
 	}
 
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
-    }
+  public function updatePassword(Request $request)
+  {
+      $validatedData = $request->validate([
+          'current_password' => 'required|string',
+          'new_password' => 'required|string|min:6',
+      ]);
+
+      $user = $request->user();
+
+      if (!Hash::check($validatedData['current_password'], $user->password)) {
+          return response()->json(['message' => 'Current password is incorrect'], 400);
+      }
+
+      $user->password = Hash::make($validatedData['new_password']);
+      $user->save();
+
+      return response()->json(['message' => 'Password updated successfully']);
+  }
+
+    public function deleteAccount(Request $request)
+  {
+      $user = $request->user();
+      $user->tokens()->delete(); // Удаляем все токены
+      $user->delete(); // Удаляем пользователя
+
+      return response()->json(['message' => 'Account deleted successfully']);
+  }
 }

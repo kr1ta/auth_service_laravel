@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TokenController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -10,10 +10,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/create-task', [TaskController::class, 'createTask']);
-    Route::get('/user-tasks', [TaskController::class, 'getUserTasks']);
+    Route::post('/update-password', [AuthController::class, 'updatePassword']);
+    Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
 });
 
-use App\Http\Controllers\UserController;
-
-Route::get('/user/{id}', [UserController::class, 'show']);  
+Route::get('/validate-token', [TokenController::class, 'validateToken']);
