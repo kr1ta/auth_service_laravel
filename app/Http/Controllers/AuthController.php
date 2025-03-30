@@ -38,7 +38,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::guard('sanctum')->attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

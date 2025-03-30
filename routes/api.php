@@ -15,3 +15,10 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/validate-token', [TokenController::class, 'validateToken']);
+
+Route::get('/data', function () {
+    return response()->json([
+        'message' => 'Hello from Microservice 1',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
