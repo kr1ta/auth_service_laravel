@@ -10,6 +10,7 @@ class SendUserCreatedToKafka
 {
     public function handle(UserCreated $event)
     {
+        \Log::info("Handling UserCreated event for user ID: {$event->userId}");
         // Конфигурация Kafka Producer
         $conf = new Conf();
         $conf->set('metadata.broker.list', 'localhost:9092');

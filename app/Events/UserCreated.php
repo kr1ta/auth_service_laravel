@@ -18,6 +18,7 @@ class UserCreated
 
     public function __construct($userId)
     {
+        \Log::info("In the event constructorfor user ID: {$userId}");
         $this->userId = $userId;
     }
 

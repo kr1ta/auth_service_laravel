@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Events\UserCreated;
 
 class AuthController extends Controller
 {
@@ -22,6 +23,9 @@ class AuthController extends Controller
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
         ]);
+
+        \Log::info("Dispatching UserCreated event for user ID: {$user->id}");
+        event(new UserCreated($user->id));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -54,39 +58,39 @@ class AuthController extends Controller
         ]);
     }
 
-	public function logout(Request $request)
-	{
-    // Удаляем все токены пользователя
-		$request->user()->tokens()->delete();
+    public function logout(Request $request)
+    {
+        // Удаляем все токены пользователя
+        $request->user()->tokens()->delete();
 
-		return response()->json(['message' => 'Successfully logged out']);
-	}
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 
-  public function updatePassword(Request $request)
-  {
-      $validatedData = $request->validate([
-          'current_password' => 'required|string',
-          'new_password' => 'required|string|min:6',
-      ]);
+    public function updatePassword(Request $request)
+    {
+        $validatedData = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6',
+        ]);
 
-      $user = $request->user();
+        $user = $request->user();
 
-      if (!Hash::check($validatedData['current_password'], $user->password)) {
-          return response()->json(['message' => 'Current password is incorrect'], 400);
-      }
+        if (!Hash::check($validatedData['current_password'], $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 400);
+        }
 
-      $user->password = Hash::make($validatedData['new_password']);
-      $user->save();
+        $user->password = Hash::make($validatedData['new_password']);
+        $user->save();
 
-      return response()->json(['message' => 'Password updated successfully']);
-  }
+        return response()->json(['message' => 'Password updated successfully']);
+    }
 
     public function deleteAccount(Request $request)
-  {
-      $user = $request->user();
-      $user->tokens()->delete(); // Удаляем все токены
-      $user->delete(); // Удаляем пользователя
+    {
+        $user = $request->user();
+        $user->tokens()->delete(); // Удаляем все токены
+        $user->delete(); // Удаляем пользователя
 
-      return response()->json(['message' => 'Account deleted successfully']);
-  }
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
 }
