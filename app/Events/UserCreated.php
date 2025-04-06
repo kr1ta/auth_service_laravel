@@ -21,11 +21,4 @@ class UserCreated
         \Log::info("In the event constructorfor user ID: {$userId}");
         $this->userId = $userId;
     }
-
-    public function broadcastOn(): array
-    {
-        return [
-            new PrivateChannel('user-created'),
-        ];
-    }
 }
