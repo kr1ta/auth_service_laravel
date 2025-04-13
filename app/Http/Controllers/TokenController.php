@@ -10,8 +10,6 @@ class TokenController extends Controller
 {
     public function validateToken(Request $request): JsonResponse
     {
-        \Log::info('Проверка токена: ' . ($request->bearerToken() ? 'токен предоставлен' : 'токен не предоставлен'));
-
         if (!$request->bearerToken()) {
             return response()->json([
                 'message' => 'Токен не предоставлен',

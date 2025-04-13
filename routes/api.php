@@ -11,9 +11,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'show']);
+    Route::delete('/user', [AuthController::class, 'deleteAccount']);
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/update-password', [AuthController::class, 'updatePassword']);
-    Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
 });
 
 Route::get('/validate-token', [TokenController::class, 'validateToken']);
