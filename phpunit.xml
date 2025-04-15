@@ -17,6 +17,26 @@
             <directory>app</directory>
         </include>
     </source>
+        <coverage>
+        <!-- Указываем, какие файлы включать в анализ покрытия -->
+        <include>
+            <directory suffix=".php">app</directory>
+        </include>
+
+        <!-- Исключаем файлы, которые не нужно анализировать -->
+        <exclude>
+            <directory suffix=".php">app/Helpers</directory>
+        </exclude>
+
+        <!-- Настройка форматов отчетов о покрытии -->
+        <report>
+            <!-- Генерация HTML-отчета -->
+            <html outputDirectory="coverage-html" />
+
+            <!-- Генерация текстового отчета в консоль -->
+            <text outputFile="php://stdout" showUncoveredFiles="false" />
+        </report>
+    </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
