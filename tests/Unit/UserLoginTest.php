@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Hash;
 
 uses(DatabaseTransactions::class);
 
@@ -25,12 +25,12 @@ test('user can login with valid credentials', function () {
     // Проверяем структуру ответа
     $response->assertJsonStructure([
         'access_token',
-        'token_type'
+        'token_type',
     ]);
 
     // Проверяем тип токена
     $response->assertJsonFragment([
-        'token_type' => 'Bearer'
+        'token_type' => 'Bearer',
     ]);
 
     // Проверяем, что токен действительно существует в базе данных
@@ -58,7 +58,7 @@ test('user cannot login with invalid credentials', function () {
 
     // Проверяем сообщение об ошибке
     $response->assertJson([
-        'message' => 'Unauthorized'
+        'message' => 'Unauthorized',
     ]);
 });
 

@@ -1,11 +1,10 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Hash;
 
 uses(DatabaseTransactions::class);
-
 
 test('user can update password successfully', function () {
     // Создаем пользователя с начальным паролем
@@ -18,7 +17,7 @@ test('user can update password successfully', function () {
 
     // Отправляем запрос на обновление пароля
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
     ])->postJson('/api/update-password', [
         'current_password' => 'old-password',
         'new_password' => 'new-password123',
@@ -32,7 +31,6 @@ test('user can update password successfully', function () {
     $this->assertTrue(Hash::check('new-password123', $user->fresh()->password));
 });
 
-
 test('user cannot update password with incorrect current password', function () {
     // Создаем пользователя с начальным паролем
     $user = User::factory()->create([
@@ -44,7 +42,7 @@ test('user cannot update password with incorrect current password', function () 
 
     // Отправляем запрос с неверным текущим паролем
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
     ])->postJson('/api/update-password', [
         'current_password' => 'wrong-password',
         'new_password' => 'new-password123',
@@ -58,7 +56,6 @@ test('user cannot update password with incorrect current password', function () 
     $this->assertFalse(Hash::check('new-password123', $user->fresh()->password));
 });
 
-
 test('validation fails when required fields are missing or invalid', function () {
     // Создаем пользователя
     $user = User::factory()->create();
@@ -66,7 +63,7 @@ test('validation fails when required fields are missing or invalid', function ()
 
     // Отправляем запрос без `current_password`
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
     ])->postJson('/api/update-password', [
         'new_password' => 'short',
     ]);

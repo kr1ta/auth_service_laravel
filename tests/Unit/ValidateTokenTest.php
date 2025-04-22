@@ -2,20 +2,7 @@
 
 namespace Tests\Unit;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use App\Http\Controllers\TokenController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Guard;
-
-use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Event;
-use App\Events\UserCreated;
-
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
@@ -66,5 +53,3 @@ test('valid token', function () {
             'user_id' => $user->id,
         ]);
 });
-
-

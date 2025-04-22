@@ -12,7 +12,7 @@ test('user can logout and tokens are deleted', function () {
 
     // Добавляем заголовок авторизации с токеном
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
     ])->postJson('/api/logout');
 
     // Проверяем, что ответ имеет статус 200

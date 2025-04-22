@@ -7,8 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use RdKafka\Producer;
 use RdKafka\Conf;
+use RdKafka\Producer;
 
 class SendUserCreatedToKafkaJob implements ShouldQueue
 {
@@ -24,8 +24,8 @@ class SendUserCreatedToKafkaJob implements ShouldQueue
     public function handle()
     {
         // Конфигурация Kafka Producer
-        $conf = new Conf();
-        $conf->set('metadata.broker.list', env('KAFKA_BROKER'));
+        $conf = new Conf;
+        $conf->set('metadata.broker.list', config('KAFKA_BROKER'));
 
         $producer = new Producer($conf);
         $topic = $producer->newTopic('user-created');

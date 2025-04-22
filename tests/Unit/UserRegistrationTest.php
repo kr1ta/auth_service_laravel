@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
 use App\Events\UserCreated;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Event;
 
 uses(DatabaseTransactions::class);
 

@@ -2,13 +2,7 @@
 
 namespace Tests\Unit;
 
-use Mockery;
 use Tests\TestCase; // Используйте TestCase из Laravel
-use App\Http\Controllers\TokenController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Guard;
 
 class ExampleTest extends TestCase
 {
@@ -19,5 +13,4 @@ class ExampleTest extends TestCase
         $this->assertTrue(true);
     }
 */
-}     
-
+}
