@@ -11,7 +11,6 @@
 |
 */
 
-
 // Применяем TestCase ко всем тестам (Unit и Feature)
 pest()->extend(Tests\TestCase::class)->in('Unit', 'Feature');
 

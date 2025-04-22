@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\JsonResponse;
 
 class TokenController extends Controller
 {
     public function validateToken(Request $request): JsonResponse
     {
-        if (!$request->bearerToken()) {
+        \Log::info('validateToken endpoint hit', [
+            'request_data' => $request->all(),
+            'headers' => $request->headers->all(), // Вывод всех заголовков
+        ]);
+        if (! $request->bearerToken()) {
             return response()->json([
                 'message' => 'Токен не предоставлен',
                 'valid' => false,
@@ -18,7 +22,7 @@ class TokenController extends Controller
         }
 
         $user = Auth::guard('sanctum')->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'message' => 'Неверный или просроченный токен',
                 'valid' => false,

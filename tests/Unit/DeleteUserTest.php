@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\User;
-use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Laravel\Sanctum\Sanctum;
 
 uses(DatabaseTransactions::class);
 test('user can delete their account', function () {
-    //$this->withoutMiddleware(\Illuminate\Auth\Middleware\EnsureEmailIsVerified::class);
+    // $this->withoutMiddleware(\Illuminate\Auth\Middleware\EnsureEmailIsVerified::class);
 
     // Используем trait RefreshDatabase для очистки базы данных после каждого теста
     $this->withoutExceptionHandling();
