@@ -25,7 +25,7 @@ class SendUserCreatedToKafkaJob implements ShouldQueue
     {
         // Конфигурация Kafka Producer
         $conf = new Conf;
-        $conf->set('metadata.broker.list', config('KAFKA_BROKER'));
+        $conf->set('metadata.broker.list', env('KAFKA_BROKER'));
 
         $producer = new Producer($conf);
         $topic = $producer->newTopic('user-created');
