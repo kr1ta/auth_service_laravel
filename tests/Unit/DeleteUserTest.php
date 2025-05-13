@@ -8,7 +8,6 @@ uses(DatabaseTransactions::class);
 test('user can delete their account', function () {
     // $this->withoutMiddleware(\Illuminate\Auth\Middleware\EnsureEmailIsVerified::class);
 
-    // Используем trait RefreshDatabase для очистки базы данных после каждого теста
     $this->withoutExceptionHandling();
 
     // Создаем пользователя и аутентифицируем его
@@ -21,9 +20,12 @@ test('user can delete their account', function () {
     // Проверяем статус ответа
     $response->assertStatus(200);
 
-    // Проверяем содержимое JSON-ответа
+    // Проверяем содержимое JSON-ответа с новой структурой
     $response->assertJson([
-        'message' => 'Account deleted successfully',
+        'data' => [
+            'message' => 'Account deleted successfully',
+        ],
+        'errors' => [],
     ]);
 
     // Проверяем, что пользователь был удален из базы данных

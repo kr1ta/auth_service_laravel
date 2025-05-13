@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\UserCreated;
 use App\Models\User;
+use App\Services\ResponseHelperService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,27 +15,36 @@ class AuthController extends Controller
     {
         \Log::info('Register endpoint hit', ['request_data' => $request->all()]);
 
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6',
+            ]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+            ]);
 
-        \Log::info("Dispatching UserCreated event for user ID: {$user->id}");
-        event(new UserCreated($user->id));
+            \Log::info("Dispatching UserCreated event for user ID: {$user->id}");
+            event(new UserCreated($user->id));
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+            return ResponseHelperService::success([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]);
+        } catch (\Exception $e) {
+            return ResponseHelperService::error([
+                [
+                    'code' => 'server_error',
+                    'message' => 'Something went wrong during registration.',
+                ],
+            ], 500);
+        }
     }
 
     public function login(Request $request)
@@ -45,7 +55,12 @@ class AuthController extends Controller
         ]);
 
         if (! Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return ResponseHelperService::error([
+                [
+                    'code' => 'invalid_input',
+                    'message' => 'Invalid email or password.',
+                ],
+            ]);
         }
 
         $user = Auth::guard('sanctum')->user();
@@ -54,7 +69,7 @@ class AuthController extends Controller
 
         $newToken = $user->createToken('auth_token');
 
-        return response()->json([
+        return ResponseHelperService::success([
             'access_token' => $newToken->plainTextToken,
             'token_type' => 'Bearer',
         ]);
@@ -62,37 +77,68 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Удаляем все токены пользователя
-        $request->user()->tokens()->delete();
+        try {
+            $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Successfully logged out']);
+            return ResponseHelperService::success(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            return ResponseHelperService::error([
+                [
+                    'code' => 'server_error',
+                    'message' => 'Failed to log out user.',
+                ],
+            ], 500);
+        }
     }
 
     public function updatePassword(Request $request)
     {
-        $validatedData = $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:6',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:6',
+            ]);
 
-        $user = $request->user();
+            $user = $request->user();
 
-        if (! Hash::check($validatedData['current_password'], $user->password)) {
-            return response()->json(['message' => 'Current password is incorrect'], 400);
+            if (! Hash::check($validatedData['current_password'], $user->password)) {
+                return ResponseHelperService::error([
+                    [
+                        'code' => 'invalid_input',
+                        'message' => 'Current password is incorrect.',
+                    ],
+                ]);
+            }
+
+            $user->password = Hash::make($validatedData['new_password']);
+            $user->save();
+
+            return ResponseHelperService::success(['message' => 'Password updated successfully']);
+        } catch (\Exception $e) {
+            return ResponseHelperService::error([
+                [
+                    'code' => 'server_error',
+                    'message' => 'Failed to update password.',
+                ],
+            ], 500);
         }
-
-        $user->password = Hash::make($validatedData['new_password']);
-        $user->save();
-
-        return response()->json(['message' => 'Password updated successfully']);
     }
 
     public function deleteAccount(Request $request)
     {
-        $user = $request->user();
-        $user->tokens()->delete(); // Удаляем все токены
-        $user->delete(); // Удаляем пользователя
+        try {
+            $user = $request->user();
+            $user->tokens()->delete();
+            $user->delete();
 
-        return response()->json(['message' => 'Account deleted successfully']);
+            return ResponseHelperService::success(['message' => 'Account deleted successfully']);
+        } catch (\Exception $e) {
+            return ResponseHelperService::error([
+                [
+                    'code' => 'server_error',
+                    'message' => 'Failed to delete account.',
+                ],
+            ], 500);
+        }
     }
 }

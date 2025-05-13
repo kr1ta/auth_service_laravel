@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ResponseHelperService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,25 +15,30 @@ class TokenController extends Controller
             'request_data' => $request->all(),
             'headers' => $request->headers->all(), // Вывод всех заголовков
         ]);
+
         if (! $request->bearerToken()) {
-            return response()->json([
-                'message' => 'Токен не предоставлен',
-                'valid' => false,
-            ], 401);
+            return ResponseHelperService::error([
+                [
+                    'code' => 'invalid_token',
+                    'message' => 'No token provided',
+                ],
+            ]);
         }
 
         $user = Auth::guard('sanctum')->user();
+
         if (! $user) {
-            return response()->json([
-                'message' => 'Неверный или просроченный токен',
-                'valid' => false,
-            ], 401);
+            return ResponseHelperService::error([
+                [
+                    'code' => 'invalid_token',
+                    'message' => 'Invalid or expired token',
+                ],
+            ]);
         }
 
-        return response()->json([
-            'message' => 'Токен валиден',
+        return ResponseHelperService::success([
             'valid' => true,
             'user_id' => $user->id,
-        ], 200);
+        ]);
     }
 }

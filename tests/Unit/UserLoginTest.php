@@ -13,7 +13,7 @@ test('user can login with valid credentials', function () {
         'password' => Hash::make('password123'),
     ]);
 
-    // Делаем POST-запрос к /login с правильными учетными данными
+    // Делаем POST-запрос к /api/login с правильными учетными данными
     $response = $this->postJson('/api/login', [
         'email' => 'test@example.com',
         'password' => 'password123',
@@ -22,18 +22,16 @@ test('user can login with valid credentials', function () {
     // Проверяем успешный ответ (статус 200)
     $response->assertStatus(200);
 
-    // Проверяем структуру ответа
-    $response->assertJsonStructure([
-        'access_token',
-        'token_type',
+    // Проверяем структуру JSON-ответа
+    $response->assertJson([
+        'data' => [
+            'access_token' => true, // просто проверяем существование
+            'token_type' => 'Bearer',
+        ],
+        'errors' => [],
     ]);
 
-    // Проверяем тип токена
-    $response->assertJsonFragment([
-        'token_type' => 'Bearer',
-    ]);
-
-    // Проверяем, что токен действительно существует в базе данных
+    // Проверяем, что токен существует в БД
     $this->assertDatabaseHas('personal_access_tokens', [
         'tokenable_id' => $user->id,
         'tokenable_type' => User::class,
@@ -53,12 +51,17 @@ test('user cannot login with invalid credentials', function () {
         'password' => 'wrongpassword',
     ]);
 
-    // Проверяем ответ с ошибкой авторизации (статус 401)
-    $response->assertStatus(401);
+    $response->assertStatus(400);
 
     // Проверяем сообщение об ошибке
     $response->assertJson([
-        'message' => 'Unauthorized',
+        'data' => null,
+        'errors' => [
+            [
+                'code' => 'invalid_input',
+                'message' => 'Invalid email or password.',
+            ],
+        ],
     ]);
 });
 

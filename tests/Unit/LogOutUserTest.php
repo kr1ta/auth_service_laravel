@@ -20,7 +20,10 @@ test('user can logout and tokens are deleted', function () {
 
     // Проверяем, что возвращается корректное сообщение
     $response->assertJson([
-        'message' => 'Successfully logged out',
+        'data' => [
+            'message' => 'Successfully logged out',
+        ],
+        'errors' => [],
     ]);
 
     // Проверяем, что все токены пользователя удалены

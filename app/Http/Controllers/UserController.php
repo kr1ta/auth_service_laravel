@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ResponseHelperService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -10,7 +11,16 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        return response()->json([
+        if (! $user) {
+            return ResponseHelperService::error([
+                [
+                    'code' => 'not_found',
+                    'message' => 'User not found',
+                ],
+            ], 404);
+        }
+
+        return ResponseHelperService::success([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,

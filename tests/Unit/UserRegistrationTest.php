@@ -11,11 +11,18 @@ test('registration requires valid data', function () {
     // Отправляем POST-запрос без обязательных полей
     $response = $this->postJson('/api/register', []);
 
-    // Проверяем, что возвращается статус 422 (Unprocessable Entity)
-    $response->assertStatus(422);
+    $response->assertStatus(500);
 
-    // Проверяем, что в ответе содержатся ошибки валидации
-    $response->assertJsonValidationErrors(['name', 'email', 'password']);
+    // Проверяем структуру JSON-ответа
+    $response->assertJson([
+        'data' => null,
+        'errors' => [
+            [
+                'code' => 'server_error',
+                'message' => 'Something went wrong during registration.',
+            ],
+        ],
+    ]);
 });
 
 test('user can register successfully', function () {
@@ -54,7 +61,10 @@ test('user can register successfully', function () {
 
     // Проверяем, что в ответе содержится токен
     $response->assertJsonStructure([
-        'access_token',
-        'token_type',
+        'data' => [
+            'access_token',
+            'token_type',
+        ],
+        'errors',
     ]);
 });

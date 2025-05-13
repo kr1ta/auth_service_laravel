@@ -23,11 +23,14 @@ test('it returns authenticated user data', function () {
 
     // Проверяем структуру JSON-ответа
     $response->assertJson([
-        'id' => $user->id,
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'created_at' => $user->created_at->toISOString(),
-        'updated_at' => $user->updated_at->toISOString(),
+        'data' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'created_at' => $user->created_at->toISOString(),
+            'updated_at' => $user->updated_at->toISOString(),
+        ],
+        'errors' => [],
     ]);
 });
 

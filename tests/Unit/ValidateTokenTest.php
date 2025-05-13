@@ -12,11 +12,16 @@ test('token is not provided', function () {
     $response = $this->getJson('/api/validate-token');
 
     // Проверяем статус ответа и содержимое JSON
-    $response->assertStatus(401)
-        ->assertJson([
-            'message' => 'Токен не предоставлен',
-            'valid' => false,
-        ]);
+    $response->assertStatus(400);
+    $response->assertJson([
+        'data' => null,
+        'errors' => [
+            [
+                'code' => 'invalid_token',
+                'message' => 'No token provided',
+            ],
+        ],
+    ]);
 });
 
 test('invalid or expired token', function () {
@@ -26,11 +31,16 @@ test('invalid or expired token', function () {
     ])->getJson('/api/validate-token');
 
     // Проверяем статус ответа и содержимое JSON
-    $response->assertStatus(401)
-        ->assertJson([
-            'message' => 'Неверный или просроченный токен',
-            'valid' => false,
-        ]);
+    $response->assertStatus(400);
+    $response->assertJson([
+        'data' => null,
+        'errors' => [
+            [
+                'code' => 'invalid_token',
+                'message' => 'Invalid or expired token',
+            ],
+        ],
+    ]);
 });
 
 test('valid token', function () {
@@ -46,10 +56,12 @@ test('valid token', function () {
     ])->getJson('/api/validate-token');
 
     // Проверяем статус ответа и содержимое JSON
-    $response->assertStatus(200)
-        ->assertJson([
-            'message' => 'Токен валиден',
-            'valid' => true,
+    $response->assertStatus(200);
+    $response->assertJson([
+        'data' => [
+            'valid' => 'true',
             'user_id' => $user->id,
-        ]);
+        ],
+        'errors' => [],
+    ]);
 });
